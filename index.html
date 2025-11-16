@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imperial Weather Command - Death Star</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        #stars {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(2px 2px at 20px 30px, white, transparent),
+                radial-gradient(2px 2px at 60px 70px, white, transparent),
+                radial-gradient(1px 1px at 50px 50px, white, transparent),
+                radial-gradient(1px 1px at 130px 80px, white, transparent),
+                radial-gradient(2px 2px at 90px 10px, white, transparent);
+            background-size: 200px 200px;
+            animation: twinkle 5s ease-in-out infinite;
+            z-index: -1;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        
+        .death-star-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            z-index: -1;
+            opacity: 0.15;
+        }
+        
+        .death-star {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 30%, #444, #111);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 
+                inset -30px -30px 60px rgba(0,0,0,0.8),
+                0 0 100px rgba(255,0,0,0.3);
+            animation: rotate 60s linear infinite;
+        }
+        
+        .death-star::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 20%;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, #800, #300);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 30px rgba(255,0,0,0.8),
+                inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        
+        .death-star::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #333, transparent);
+            transform: translateY(-50%);
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(139,0,0,0.2), rgba(0,0,0,0.9));
+            border: 2px solid #8B0000;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 40px rgba(139,0,0,0.5);
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 40px rgba(139,0,0,0.5); }
+            50% { box-shadow: 0 0 60px rgba(255,0,0,0.8); }
+        }
+        
+        h1 {
+            font-size: 3em;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: #ff0000;
+            text-shadow: 0 0 20px #ff0000, 0 0 40px #8B0000;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            color: #aaa;
+            letter-spacing: 3px;
+        }
+        
+        .control-panel {
+            background: linear-gradient(135deg, rgba(20,20,20,0.95), rgba(0,0,0,0.98));
+            border: 2px solid #8B0000;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 
+                0 0 30px rgba(139,0,0,0.4),
+                inset 0 0 20px rgba(255,0,0,0.1);
+        }
+        
+        .mode-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .mode-btn {
+            background: linear-gradient(135deg, #1a0000, #000);
+            border: 2px solid #8B0000;
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1em;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mode-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,0,0,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+        
+        .mode-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .mode-btn:hover {
+            border-color: #ff0000;
+            box-shadow: 0 0 20px rgba(255,0,0,0.6);
+            transform: translateY(-2px);
+        }
+        
+        .mode-btn.active {
+            background: linear-gradient(135deg, #8B0000, #ff0000);
+            box-shadow: 0 0 30px rgba(255,0,0,0.8);
+        }
+        
+        .vader-quote {
+            background: linear-gradient(135deg, rgba(139,0,0,0.2), rgba(0,0,0,0.95));
+            border: 2px solid #ff0000;
+            border-left: 5px solid #ff0000;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-style: italic;
+            color: #ff6b6b;
+            box-shadow: 0 0 30px rgba(255,0,0,0.3);
+            animation: fadeIn 1s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .weather-display {
+            background: linear-gradient(135deg, rgba(20,20,20,0.95), rgba(0,0,0,0.98));
+            border: 2px solid #8B0000;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 
+                0 0 30px rgba(139,0,0,0.4),
+                inset 0 0 20px rgba(255,0,0,0.1);
+        }
+        
+        .weather-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .weather-card {
+            background: linear-gradient(135deg, #1a0000, #000);
+            border: 1px solid #8B0000;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .weather-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 25px rgba(255,0,0,0.5);
+            border-color: #ff0000;
+        }
+        
+        .weather-card .icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .weather-card .value {
+            font-size: 2em;
+            color: #ff0000;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255,0,0,0.5);
+        }
+        
+        .weather-card .label {
+            color: #aaa;
+            margin-top: 10px;
+            font-size: 0.9em;
+            letter-spacing: 2px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.5em;
+            color: #ff0000;
+        }
+        
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 50px;
+            border-top: 2px solid #8B0000;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .input-group {
+            margin: 20px 0;
+        }
+        
+        .input-group label {
+            display: block;
+            color: #ff0000;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0,0,0,0.8);
+            border: 2px solid #8B0000;
+            border-radius: 5px;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1em;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #ff0000;
+            box-shadow: 0 0 15px rgba(255,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="stars"></div>
+    
+    <div class="death-star-container">
+        <div class="death-star"></div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <h1>⚫ IMPERIAL WEATHER COMMAND ⚫</h1>
+            <p class="subtitle">Death Star Atmospheric Intelligence System</p>
+        </header>
+        
+        <div class="control-panel">
+            <h2 style="color: #ff0000; margin-bottom: 20px; text-align: center;">SELECT OPERATIONAL MODE</h2>
+            <div class="mode-selector">
+                <button class="mode-btn active" onclick="setMode('current')">
+                    <span style="position: relative; z-index: 1;">
+                        <div style="font-size: 2em;">🌡️</div>
+                        <div>CURRENT CONDITIONS</div>
+                    </span>
+                </button>
+                <button class="mode-btn" onclick="setMode('forecast')">
+                    <span style="position: relative; z-index: 1;">
+                        <div style="font-size: 2em;">🔮</div>
+                        <div>FUTURE FORECAST</div>
+                    </span>
+                </button>
+                <button class="mode-btn" onclick="setMode('history')">
+                    <span style="position: relative; z-index: 1;">
+                        <div style="font-size: 2em;">📜</div>
+                        <div>HISTORICAL ARCHIVE</div>
+                    </span>
+                </button>
+            </div>
+            
+            <div id="daySelector" style="display: none;">
+                <div class="input-group">
+                    <label for="daysInput">NUMBER OF DAYS:</label>
+                    <input type="number" id="daysInput" min="1" max="16" value="7">
+                </div>
+            </div>
+        </div>
+        
+        <div class="vader-quote" id="vaderQuote">
+            ⚫ "The Force is strong with this atmospheric data..."
+        </div>
+        
+        <div class="weather-display">
+            <h2 style="color: #ff0000; margin-bottom: 20px; text-align: center;">ATMOSPHERIC INTELLIGENCE</h2>
+            <div id="weatherContent">
+                <div class="loading">ACCESSING IMPERIAL SATELLITES</div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>⚫ THE EMPIRE'S WEATHER DOMINION IS COMPLETE ⚫</p>
+            <p style="margin-top: 10px;">May the Dark Side guide your forecast decisions</p>
+        </footer>
+    </div>
+    
+    <script>
+        let currentMode = 'current';
+        
+        const vaderQuotes = [
+            "I find your lack of weather preparation... disturbing.",
+            "The Force reveals all atmospheric conditions to me.",
+            "Do not underestimate the power of meteorological data.",
+            "I have felt a great disturbance in the atmosphere.",
+            "The Empire's satellites see all. Know all.",
+            "Search your feelings, you know the forecast to be true.",
+            "The circle is now complete. The weather data is yours.",
+            "Impressive... Most impressive. The forecast accuracy is high.",
+            "The power of the Dark Side flows through these readings."
+        ];
+        
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.mode-btn').classList.add('active');
+            
+            const daySelector = document.getElementById('daySelector');
+            daySelector.style.display = mode === 'current' ? 'none' : 'block';
+            
+            if (mode === 'history') {
+                document.getElementById('daysInput').max = '30';
+            } else if (mode === 'forecast') {
+                document.getElementById('daysInput').max = '16';
+            }
+            
+            updateVaderQuote();
+            loadWeatherData();
+        }
+        
+        function updateVaderQuote() {
+            const quote = vaderQuotes[Math.floor(Math.random() * vaderQuotes.length)];
+            document.getElementById('vaderQuote').innerHTML = `⚫ "${quote}"`;
+        }
+        
+        async function loadWeatherData() {
+            const content = document.getElementById('weatherContent');
+            content.innerHTML = '<div class="loading">CONSULTING THE DARK SIDE</div>';
+            
+            updateVaderQuote();
+            
+            setTimeout(async () => {
+                if (currentMode === 'current') {
+                    await loadCurrent();
+                } else if (currentMode === 'forecast') {
+                    await loadForecast();
+                } else if (currentMode === 'history') {
+                    await loadHistory();
+                }
+            }, 1500);
+        }
+        
+        async function loadCurrent() {
+            try {
+                const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=32.7157&longitude=-117.1611&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America/Los_Angeles');
+                const data = await response.json();
+                const current = data.current;
+                
+                const html = `
+                    <div class="weather-grid">
+                        <div class="weather-card">
+                            <div class="icon">🌡️</div>
+                            <div class="value">${current.temperature_2m}°F</div>
+                            <div class="label">TEMPERATURE</div>
+                        </div>
+                        <div class="weather-card">
+                            <div class="icon">💧</div>
+                            <div class="value">${current.relative_humidity_2m}%</div>
+                            <div class="label">HUMIDITY</div>
+                        </div>
+                        <div class="weather-card">
+                            <div class="icon">💨</div>
+                            <div class="value">${current.wind_speed_10m}</div>
+                            <div class="label">WIND (MPH)</div>
+                        </div>
+                        <div class="weather-card">
+                            <div class="icon">⏰</div>
+                            <div class="value" style="font-size: 1.2em;">${current.time}</div>
+                            <div class="label">TIME</div>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('weatherContent').innerHTML = html;
+            } catch (error) {
+                document.getElementById('weatherContent').innerHTML = '<p style="color: #ff0000; text-align: center;">ERROR: Imperial systems malfunction detected</p>';
+            }
+        }
+        
+        async function loadForecast() {
+            const days = document.getElementById('daysInput').value;
+            try {
+                const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=32.7157&longitude=-117.1611&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code&temperature_unit=fahrenheit&timezone=America/Los_Angeles&forecast_days=${days}`);
+                const data = await response.json();
+                const daily = data.daily;
+                
+                let html = '<div class="weather-grid">';
+                for (let i = 0; i < daily.time.length; i++) {
+                    html += `
+                        <div class="weather-card">
+                            <div class="icon">📅</div>
+                            <div class="value" style="font-size: 1em;">${daily.time[i]}</div>
+                            <div class="label">HIGH: ${daily.temperature_2m_max[i]}°F</div>
+                            <div class="label">LOW: ${daily.temperature_2m_min[i]}°F</div>
+                            <div class="label">RAIN: ${daily.precipitation_sum[i]}mm</div>
+                        </div>
+                    `;
+                }
+                html += '</div>';
+                
+                document.getElementById('weatherContent').innerHTML = html;
+            } catch (error) {
+                document.getElementById('weatherContent').innerHTML = '<p style="color: #ff0000; text-align: center;">ERROR: Future vision clouded</p>';
+            }
+        }
+        
+        async function loadHistory() {
+            const days = document.getElementById('daysInput').value;
+            const endDate = new Date();
+            endDate.setDate(endDate.getDate() - 1);
+            const startDate = new Date(endDate);
+            startDate.setDate(startDate.getDate() - days + 1);
+            
+            const formatDate = (d) => d.toISOString().split('T')[0];
+            
+            try {
+                const response = await fetch(`https://archive-api.open-meteo.com/v1/archive?latitude=32.7157&longitude=-117.1611&start_date=${formatDate(startDate)}&end_date=${formatDate(endDate)}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code&temperature_unit=fahrenheit&timezone=America/Los_Angeles`);
+                const data = await response.json();
+                const daily = data.daily;
+                
+                let html = '<div class="weather-grid">';
+                for (let i = 0; i < daily.time.length; i++) {
+                    html += `
+                        <div class="weather-card">
+                            <div class="icon">📜</div>
+                            <div class="value" style="font-size: 1em;">${daily.time[i]}</div>
+                            <div class="label">HIGH: ${daily.temperature_2m_max[i]}°F</div>
+                            <div class="label">LOW: ${daily.temperature_2m_min[i]}°F</div>
+                            <div class="label">RAIN: ${daily.precipitation_sum[i]}mm</div>
+                        </div>
+                    `;
+                }
+                html += '</div>';
+                
+                document.getElementById('weatherContent').innerHTML = html;
+            } catch (error) {
+                document.getElementById('weatherContent').innerHTML = '<p style="color: #ff0000; text-align: center;">ERROR: Archives corrupted</p>';
+            }
+        }
+        
+        loadWeatherData();
+        setInterval(updateVaderQuote, 10000);
+        document.getElementById('daysInput').addEventListener('change', loadWeatherData);
+    </script>
+</body>
+</html>
