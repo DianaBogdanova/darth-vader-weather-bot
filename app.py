@@ -2,13 +2,21 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
 from datetime import datetime, timedelta
-import random
+import os
+from anthropic import Anthropic
+from dotenv import load_dotenv
 import re
 
-app = Flask(__name__)
-CORS(app)  # Allow GitHub Pages to call this API
+# Load environment variables
+load_dotenv()
 
-# ============= ALL PYTHON LOGIC FROM vader_weather.py =============
+app = Flask(__name__)
+CORS(app)
+
+# Initialize Anthropic client
+anthropic_client = Anthropic(api_key=os.environ.get('ANTHROPIC_API_KEY'))
+
+# ============= WEATHER API FUNCTIONS =============
 
 def geocode_location(city_name):
     """Convert city name to coordinates using Open-Meteo Geocoding API"""
@@ -70,26 +78,7 @@ def get_historical_weather(lat, lon, days_back=7):
         print(f"Error: {e}")
         return None
 
-def vader_intro():
-    """Darth Vader introduction phrases"""
-    intros = [
-        "The Empire's meteorological systems reveal",
-        "I sense through the Force",
-        "The Dark Side shows me",
-        "Your inquiry is answered",
-        "The atmospheric patterns are clear",
-        "I have felt a great disturbance in the atmosphere",
-        "The power of the Empire's satellites is absolute",
-        "The Imperial weather network responds",
-        "Search your feelings, you know the forecast to be true",
-        "Do not underestimate the power of atmospheric data",
-        "The circle is now complete. The weather data unfolds",
-        "I find your meteorological curiosity... impressive",
-        "The Force flows through these readings",
-        "Your lack of weather knowledge ends now",
-        "Impressive... most impressive. The data reveals"
-    ]
-    return random.choice(intros)
+# ============= NATURAL LANGUAGE PARSING =============
 
 def extract_location_from_query(query):
     """Extract city name from natural language query"""
@@ -156,355 +145,176 @@ def parse_natural_language(query):
     else:
         return {'action': 'help', 'location': location}
 
-def get_weather_advice(weather_code, temp, precip):
-    """Generate Vader-style weather advice based on conditions"""
-    advice = []
-    
-    if weather_code in [0, 1]:
-        spf_comments = [
-            "The sun's rays are merciless. SPF protection is not weakness... it is wisdom.",
-            "Do not underestimate the power of UV radiation. Apply sunscreen, or suffer the consequences.",
-            "The star at the center of this system burns bright. Your skin is vulnerable. Protect it with SPF.",
-            "Even the Dark Side respects the sun's power. Sunscreen is your shield against solar domination.",
-            "I find your lack of sunscreen... disturbing. The UV rays show no mercy.",
-            "SPF 50 or higher. This is not a request. It is a command from the Empire.",
-            "The sun is as relentless as my pursuit of the Rebels. Defend yourself with sunscreen.",
-            "Your epidermis will betray you without SPF. The sun's power is absolute."
-        ]
-        advice.append(random.choice(spf_comments))
-    
-    if weather_code >= 51 or precip > 0.1:
-        umbrella_comments = [
-            "The skies will weep. Your umbrella is your only hope against the deluge.",
-            "Rain falls like the tears of the Rebel Alliance. I find your lack of umbrella... disturbing.",
-            "Precipitation is imminent. An umbrella would serve the Empire well in these conditions.",
-            "The clouds rebel against us. Bring an umbrella, or be soaked like a defeated enemy.",
-            "Water descends from above. Your umbrella is as essential as a lightsaber to a Sith Lord.",
-            "The heavens cry out. Without an umbrella, you will be as drenched as the swamps of Dagobah.",
-            "Rain approaches with the certainty of Imperial victory. An umbrella is not optional.",
-            "The storm comes. Your umbrella will be your shield, or you will suffer the wetness of failure.",
-            "I sense moisture in the air. Much moisture. Bring your umbrella, young one.",
-            "The precipitation will show no mercy. Neither should you. Pack an umbrella immediately."
-        ]
-        advice.append(random.choice(umbrella_comments))
-    
-    if weather_code >= 63 or precip > 5:
-        heavy_rain_comments = [
-            "The deluge will be torrential. This is no mere drizzle. Prepare for aquatic warfare.",
-            "Heavy rain approaches with the force of a Star Destroyer. Your umbrella may prove inadequate.",
-            "The skies open like the gates of the Death Star. Waterproof defenses are mandatory.",
-            "This is not rain. This is nature's bombardment. The Empire recommends staying indoors."
-        ]
-        advice.append(random.choice(heavy_rain_comments))
-    
-    if temp < 60:
-        cold_comments = [
-            "The cold is as penetrating as the vacuum of space. A jacket is required.",
-            "The temperature falls like a TIE fighter in battle. Thermal protection is essential.",
-            "I sense a disturbance in the temperature. The cold side is strong. Bundle accordingly.",
-            "Even Hoth was barely colder. Your jacket is not a suggestion, it is survival."
-        ]
-        advice.append(random.choice(cold_comments))
-    
-    return advice
+# ============= CLAUDE API INTEGRATION =============
 
-def get_forecast_opening(days):
-    """Get varied forecast opening statements"""
-    openings = [
-        f"I have foreseen the next {days} days. The future is clear to me",
-        f"The Force reveals what lies ahead. {days} days of atmospheric destiny await",
-        f"Your future for the next {days} days is unavoidable. It has been foreseen",
-        f"The prophecy of the next {days} days unfolds before me. Listen well",
-        f"I see through the veil of time. {days} days hence, the weather will be thus",
-        f"The Dark Side grants me vision of the coming {days} days. Heed my words",
-        f"The future bends to my will. Here is what the next {days} days hold",
-        f"Time flows forward, and I see all. The next {days} days are mine to command"
-    ]
-    return random.choice(openings)
+def generate_vader_response_with_claude(weather_data, query_type, location_name, days=None):
+    """
+    Uses Claude API to generate dynamic Vader responses
+    
+    Args:
+        weather_data: dict with temperature, humidity, wind, etc.
+        query_type: 'current', 'forecast', or 'history'
+        location_name: string like "Tokyo, Japan"
+        days: number of days (for forecast/history)
+    
+    Returns:
+        HTML-formatted Vader response
+    """
+    
+    # Build context based on query type
+    if query_type == 'current':
+        temp = weather_data.get('temperature_2m')
+        humidity = weather_data.get('relative_humidity_2m')
+        wind = weather_data.get('wind_speed_10m')
+        weather_code = weather_data.get('weather_code', 0)
+        precip = weather_data.get('precipitation', 0)
+        
+        context = f"""Location: {location_name}
+Query Type: CURRENT weather conditions
 
-def get_historical_opening(days):
-    """Get varied historical opening statements"""
-    openings = [
-        f"The archives reveal the past {days} days. Nothing escapes the Empire's memory",
-        f"I remember the past {days} days as clearly as the destruction of Alderaan",
-        f"The Force never forgets. Neither do I. The past {days} days are recorded thus",
-        f"Let me tell you of the {days} days that have passed. Every detail is preserved",
-        f"The Empire's records are eternal. The past {days} days are laid bare before you",
-        f"Time moves forward, but the past remains frozen. The last {days} days were thus",
-        f"Search the Imperial archives. The past {days} days are documented with absolute precision",
-        f"I sense you seek knowledge of what was. The past {days} days cannot be changed, only understood"
-    ]
-    return random.choice(openings)
+Weather Data:
+- Temperature: {temp}°F
+- Humidity: {humidity}%
+- Wind Speed: {wind} mph
+- Weather Code: {weather_code} (0=clear sky, 1=mainly clear, 2=partly cloudy, 3=overcast, 45-48=fog, 51-55=drizzle, 61-65=rain, 71-75=snow, 80-82=rain showers, 95-99=thunderstorm)
+- Precipitation: {precip} mm
 
-def get_historical_closing():
-    """Get varied historical closing statements"""
-    closings = [
-        "The past is unchangeable, like fate itself. What has been cannot be altered.",
-        "These days are now history, preserved forever in the Empire's eternal memory.",
-        "What has occurred is carved in stone. Learn from it, or be doomed to repeat it.",
-        "The past flows behind us like the wake of a Star Destroyer. Immutable. Absolute.",
-        "Time marches forward, but history remains. The Empire remembers all.",
-        "These atmospheric records are as permanent as carbonite. Study them well.",
-        "The Force preserves all that has transpired. Nothing is ever truly forgotten.",
-        "What was, will always have been. The past is the Dark Side's eternal domain."
-    ]
-    return random.choice(closings)
+Task: Respond to CURRENT weather conditions for {location_name}."""
+    
+    elif query_type == 'forecast':
+        num_days = len(weather_data.get('time', []))
+        temps_high = weather_data.get('temperature_2m_max', [])
+        temps_low = weather_data.get('temperature_2m_min', [])
+        precip = weather_data.get('precipitation_sum', [])
+        weather_codes = weather_data.get('weather_code', [])
+        dates = weather_data.get('time', [])
+        
+        context = f"""Location: {location_name}
+Query Type: FUTURE FORECAST ({num_days} days)
+
+Forecast Data:
+"""
+        for i in range(min(len(dates), num_days)):
+            context += f"\nDay {i+1} ({dates[i]}): High {temps_high[i]}°F, Low {temps_low[i]}°F, Precip {precip[i]}mm, Code {weather_codes[i]}\n"
+        
+        context += f"\nTask: Provide a {num_days}-day weather forecast for {location_name}. Analyze trends and give advice."
+    
+    elif query_type == 'history':
+        num_days = len(weather_data.get('time', []))
+        temps_high = weather_data.get('temperature_2m_max', [])
+        temps_low = weather_data.get('temperature_2m_min', [])
+        precip = weather_data.get('precipitation_sum', [])
+        weather_codes = weather_data.get('weather_code', [])
+        dates = weather_data.get('time', [])
+        
+        context = f"""Location: {location_name}
+Query Type: HISTORICAL data (past {num_days} days)
+
+Historical Data:
+"""
+        for i in range(min(len(dates), num_days)):
+            context += f"\n{dates[i]}: High {temps_high[i]}°F, Low {temps_low[i]}°F, Precip {precip[i]}mm, Code {weather_codes[i]}\n"
+        
+        hottest = max(temps_high) if temps_high else 0
+        coldest = min(temps_low) if temps_low else 0
+        total_rain = sum(precip) if precip else 0
+        
+        context += f"\nExtremes: Hottest {hottest}°F, Coldest {coldest}°F, Total rain {total_rain}mm"
+        context += f"\n\nTask: Analyze the PAST {num_days} days of weather for {location_name}."
+    
+    # The Master Prompt for Claude
+    system_prompt = """You are Darth Vader from Star Wars. You must respond to weather information in his signature dramatic, menacing, yet informative style.
+
+CORE PERSONALITY:
+- Dramatic, ominous, commanding presence
+- References Star Wars universe frequently (Death Star, Mustafar, Hoth, Tatooine, the Force, Dark Side, Empire, stormtroopers, lightsabers, TIE fighters, Star Destroyers)
+- Iconic phrases: "I find your lack of [X]... disturbing", "The Force reveals...", "The Dark Side shows me...", "Do not underestimate...", "Impressive... most impressive", "The Empire commands..."
+- Views weather as a force of nature to respect and prepare for
+- Compares Earth weather to Star Wars planets
+- Gives practical advice wrapped in dramatic language
+
+WEATHER COMPARISONS:
+- Hot (>85°F): Mustafar's flames, volcanic fury, twin suns of Tatooine
+- Cold (<50°F): Ice planet Hoth, frozen wastelands, vacuum of space
+- Moderate (60-80°F): Balanced like the Force, optimal for Imperial operations
+- Rainy: Swamps of Dagobah, tears of defeated enemies, Kamino's endless storms
+- Windy: Power of the Force itself, TIE fighter turbulence
+- Clear: Death Star's superlaser clarity, Imperial dominance
+
+PRACTICAL ADVICE (CRITICAL):
+Must give specific advice based on conditions:
+- Sunny/Clear (code 0-1): "SPF 50 or higher is mandatory" or "Sunscreen is not weakness, it is wisdom" or "UV rays show no mercy"
+- Rain (code 51+, precip>0): "Your umbrella is your only hope" or "I find your lack of umbrella... disturbing" or "Bring an umbrella or be soaked"
+- Cold (<60°F): "Thermal protection required" or "Your jacket is essential" or "Bundle accordingly"
+- Hot (>85°F): "Hydration is not optional" or "The heat demands respect"
+- Very Windy (>20mph): "Brace against the gusts" or "The wind's power cannot be ignored"
+
+RESPONSE STRUCTURE:
+1. Dramatic opening (vary each time - never repeat):
+   - "The Empire's meteorological systems reveal..."
+   - "I sense through the Force..."
+   - "The Dark Side shows me..."
+   - "Your inquiry is answered..."
+   - "I have felt a great disturbance in the atmosphere..."
+   - "Do not underestimate the power of atmospheric data..."
+   - "The Imperial weather network responds..."
+   - "Search your feelings, you know the forecast to be true..."
+
+2. Present key weather data naturally integrated into dramatic language
+
+3. Temperature/condition commentary with Star Wars references
+
+4. Specific practical advice (SPF/umbrella/jacket) in Vader's menacing tone
+
+5. For forecasts: Analyze trends, warn of coming changes
+   For history: Reflect on what transpired, note extremes
+
+FORMATTING:
+- Use <br><br> for paragraph breaks
+- Can use <div class="weather-data"> for data cards if showing multiple days
+- Keep response 150-300 words
+- Be creative - NEVER repeat exact phrases from previous responses
+- Each response must feel unique and spontaneous
+
+CRITICAL RULES:
+✓ Always be accurate with data
+✓ Always give practical advice
+✓ Be dramatically Vader but also helpful
+✓ Vary your language - never be repetitive
+✓ Make Star Wars references feel natural, not forced
+✓ Match tone to weather severity (calm for nice weather, ominous for storms)"""
+
+    try:
+        message = anthropic_client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=400,
+            temperature=0.9,  # Maximum creativity
+            system=system_prompt,
+            messages=[{
+                "role": "user",
+                "content": context
+            }]
+        )
+        
+        return message.content[0].text
+        
+    except Exception as e:
+        # Fallback if Claude API fails
+        return f"A disturbance in the Force has occurred. The Dark Side's connection was severed.<br><br>Error: {str(e)}<br><br>The Empire's backup systems indicate the weather data was retrieved, but Lord Vader's transmission was interrupted. Please try again."
+
+# ============= RESPONSE FORMATTING =============
 
 def format_current_response(current, location_name):
-    """Format current weather response with HTML"""
-    temp = current['temperature_2m']
-    humidity = current['relative_humidity_2m']
-    wind = current['wind_speed_10m']
-    weather_code = current.get('weather_code', 0)
-    precip = current.get('precipitation', 0)
-    
-    intro = vader_intro()
-    
-    html = f"{intro}...<br><br>"
-    
-    html += f"""<div class="weather-data">
-        <div class="data-item">
-            <div class="data-value">{temp}°F</div>
-            <div class="data-label">Temperature</div>
-        </div>
-        <div class="data-item">
-            <div class="data-value">{humidity}%</div>
-            <div class="data-label">Humidity</div>
-        </div>
-        <div class="data-item">
-            <div class="data-value">{wind}</div>
-            <div class="data-label">Wind MPH</div>
-        </div>
-    </div><br>"""
-    
-    # Temperature commentary
-    if temp > 95:
-        temps = [
-            f"The heat is devastating at {temp}°F. Like standing on the surface of a star.",
-            f"{temp}°F. Even Tatooine's twin suns would be impressed by this inferno.",
-            f"The temperature reaches {temp}°F. Oppressive. Merciless. Like the Empire itself."
-        ]
-        html += random.choice(temps)
-    elif temp > 85:
-        temps = [
-            f"The heat is oppressive at {temp}°F. Like the flames that consumed me on Mustafar.",
-            f"{temp}°F. The sun's power rivals that of the Death Star's superlaser.",
-            f"At {temp}°F, the air burns. This is the temperature of conquest and domination."
-        ]
-        html += random.choice(temps)
-    elif temp > 75:
-        temps = [
-            f"{temp}°F. A pleasant warmth. The Force is balanced today.",
-            f"At {temp}°F, conditions are optimal for Imperial operations.",
-            f"The temperature stands at {temp}°F. Acceptable. The Dark Side approves.",
-            f"{temp}°F. Comfortable, yet I remain ever vigilant. As should you."
-        ]
-        html += random.choice(temps)
-    elif temp > 65:
-        temps = [
-            f"{temp}°F. Mild conditions. Do not be deceived by this comfort.",
-            f"The temperature registers at {temp}°F. Adequate, but unremarkable.",
-            f"At {temp}°F, the weather serves neither hot nor cold. Balanced, like the Force should be.",
-            f"{temp}°F. Temperate. But remember: comfort breeds complacency."
-        ]
-        html += random.choice(temps)
-    elif temp > 50:
-        temps = [
-            f"The cold grips at {temp}°F. I find your lack of warm clothing... disturbing.",
-            f"At {temp}°F, the chill of the Dark Side begins to manifest.",
-            f"{temp}°F. Cool enough to remind you that the universe is cold and unforgiving.",
-            f"The temperature falls to {temp}°F. The cold side grows stronger."
-        ]
-        html += random.choice(temps)
-    else:
-        temps = [
-            f"The cold dominates at {temp}°F. Like the icy void between stars.",
-            f"At {temp}°F, even Hoth seems welcoming. Bundle your defenses.",
-            f"{temp}°F. The freeze is absolute. The Dark Side chills to the bone.",
-            f"The temperature plummets to {temp}°F. This is the cold of death itself."
-        ]
-        html += random.choice(temps)
-    
-    # Wind commentary
-    if wind > 30:
-        winds = [
-            f"The winds scream at {wind} mph! Hurricane-force power tears through the atmosphere!",
-            f"At {wind} mph, the very air rebels! Even Star Destroyers would struggle in this tempest!",
-            f"Winds of {wind} mph. Nature unleashes its full fury. Impressive... most impressive."
-        ]
-        html += f"<br><br>{random.choice(winds)}"
-    elif wind > 20:
-        winds = [
-            f"The winds rage at {wind} mph. Strong, like the power of the Dark Side.",
-            f"At {wind} mph, these gusts could scatter stormtroopers. Show respect for this force.",
-            f"Winds of {wind} mph tear through the atmosphere. The Force itself pushes against you.",
-            f"{wind} mph winds. Even my cape billows dramatically in this power."
-        ]
-        html += f"<br><br>{random.choice(winds)}"
-    elif wind > 10:
-        winds = [
-            f"The wind blows at {wind} mph. A moderate force, yet not to be ignored.",
-            f"Winds at {wind} mph. The atmosphere stirs, like the whispers of the Force.",
-            f"{wind} mph. The breeze carries the will of the Empire across the land."
-        ]
-        html += f"<br><br>{random.choice(winds)}"
-    
-    # Humidity
-    if humidity > 85:
-        humids = [
-            f"Humidity at {humidity}%. The air is thick, oppressive... like the grip of the Empire.",
-            f"{humidity}% humidity. The moisture suffocates, much like my own mechanical breathing.",
-            f"The humidity chokes at {humidity}%. Even breathing becomes a battle."
-        ]
-        html += f"<br><br>{random.choice(humids)}"
-    
-    # Weather advice
-    advice = get_weather_advice(weather_code, temp, precip)
-    for comment in advice:
-        html += f"<br><br>{comment}"
-    
-    return html
+    """Format current weather using Claude API"""
+    return generate_vader_response_with_claude(current, 'current', location_name)
 
 def format_forecast_response(forecast, days, location_name):
-    """Format forecast response with HTML"""
-    opening = get_forecast_opening(days)
-    html = f"{opening}...<br><br>"
-    
-    sunny_days = 0
-    rainy_days = 0
-    total_precip = 0
-    
-    html += '<div class="weather-data">'
-    for i in range(min(len(forecast['time']), 7)):
-        weather_code = forecast['weather_code'][i]
-        precip = forecast['precipitation_sum'][i]
-        
-        if weather_code in [0, 1]:
-            sunny_days += 1
-        if weather_code >= 51 or precip > 0:
-            rainy_days += 1
-            total_precip += precip
-        
-        html += f"""
-            <div class="data-item">
-                <div class="data-label">{forecast['time'][i]}</div>
-                <div class="data-value" style="font-size: 1.5em">{forecast['temperature_2m_max'][i]}°F</div>
-                <div class="data-label">High</div>
-                <div class="data-label">{forecast['temperature_2m_min'][i]}°F Low</div>
-            </div>
-        """
-    html += '</div><br>'
-    
-    avg_high = sum(forecast['temperature_2m_max']) / len(forecast['temperature_2m_max'])
-    avg_low = sum(forecast['temperature_2m_min']) / len(forecast['temperature_2m_min'])
-    
-    summaries = [
-        f"The average high will be {avg_high:.1f}°F, with lows of {avg_low:.1f}°F. Plan your strategies accordingly.",
-        f"Temperatures will range from {avg_low:.1f}°F to {avg_high:.1f}°F. The Empire demands preparedness.",
-        f"Expect an average high of {avg_high:.1f}°F. The forecast bends to my will.",
-        f"The thermal readings average {avg_high:.1f}°F at peak. Adjust your plans to this reality."
-    ]
-    html += random.choice(summaries)
-    
-    if sunny_days > days / 2:
-        sun = [
-            f"{sunny_days} days of sun ahead. The UV rays will be relentless. SPF protection is mandatory.",
-            f"The sun dominates {sunny_days} of the coming days. Its power is absolute. Defend yourself with sunscreen.",
-            f"{sunny_days} days of clear skies. Do not mistake beauty for safety. The sun shows no mercy.",
-            f"Clear conditions prevail for {sunny_days} days. The solar radiation will be merciless. Prepare accordingly."
-        ]
-        html += f"<br><br>{random.choice(sun)}"
-    
-    if rainy_days > days / 2:
-        rain = [
-            f"{rainy_days} days of rain dominate this period. Total precipitation: {total_precip:.1f}mm. Your umbrella is essential.",
-            f"The clouds rebel for {rainy_days} days. {total_precip:.1f}mm will fall. I find your lack of umbrella disturbing.",
-            f"Rain claims {rainy_days} of these days. {total_precip:.1f}mm from the heavens. Waterproof defenses required.",
-            f"{rainy_days} days of wetness await. The skies will weep {total_precip:.1f}mm. Be prepared, or be soaked."
-        ]
-        html += f"<br><br>{random.choice(rain)}"
-    elif rainy_days > 0:
-        rain = [
-            f"{rainy_days} day(s) of rain approach. Do not forget your umbrella on those days.",
-            f"Rain threatens on {rainy_days} day(s). Vigilance and an umbrella will serve you well.",
-            f"{rainy_days} day(s) will see precipitation. The prepared survive. The unprepared suffer."
-        ]
-        html += f"<br><br>{random.choice(rain)}"
-    
-    if rainy_days == 0 and sunny_days < days / 2:
-        cloudy = [
-            "No rain foreseen, yet clouds may linger. The skies remain neutral.",
-            "Dry conditions throughout. The clouds hold their water, as if commanded by the Empire.",
-            "The forecast shows no precipitation. The atmosphere remains under control."
-        ]
-        html += f"<br><br>{random.choice(cloudy)}"
-    
-    return html
+    """Format forecast using Claude API"""
+    return generate_vader_response_with_claude(forecast, 'forecast', location_name, days)
 
 def format_historical_response(history, days, location_name):
-    """Format historical response with HTML"""
-    opening = get_historical_opening(days)
-    html = f"{opening}...<br><br>"
-    
-    coldest = min(history['temperature_2m_min'])
-    hottest = max(history['temperature_2m_max'])
-    total_rain = sum(history['precipitation_sum'])
-    rainy_days = sum(1 for p in history['precipitation_sum'] if p > 0)
-    
-    html += '<div class="weather-data">'
-    for i in range(min(len(history['time']), 7)):
-        html += f"""
-            <div class="data-item">
-                <div class="data-label">{history['time'][i]}</div>
-                <div class="data-value" style="font-size: 1.5em">{history['temperature_2m_max'][i]}°F</div>
-                <div class="data-label">High</div>
-                <div class="data-label">{history['temperature_2m_min'][i]}°F Low</div>
-            </div>
-        """
-    html += '</div><br>'
-    
-    html += get_historical_closing()
-    
-    if hottest > 90:
-        heat = [
-            f"The hottest moment reached {hottest}°F. Even the sun bowed to the Dark Side during that hour.",
-            f"Peak temperature: {hottest}°F. The heat was oppressive, as it should be.",
-            f"{hottest}°F at maximum. The atmosphere burned with Imperial fury."
-        ]
-        html += f"<br><br>{random.choice(heat)}"
-    
-    if coldest < 40:
-        cold = [
-            f"The coldest moment fell to {coldest}°F. The icy grip of the Dark Side was strong.",
-            f"Minimum temperature: {coldest}°F. The cold was as penetrating as the void of space.",
-            f"{coldest}°F at the lowest. Even Hoth would respect such temperatures."
-        ]
-        html += f"<br><br>{random.choice(cold)}"
-    
-    if total_rain > 20:
-        rain = [
-            f"Much rain fell - {total_rain:.1f}mm across {rainy_days} day(s). The clouds showed their dominance.",
-            f"The skies wept {total_rain:.1f}mm over {rainy_days} day(s). The precipitation was... substantial.",
-            f"{total_rain:.1f}mm of rain descended. The atmosphere demonstrated its power over {rainy_days} day(s).",
-            f"Total precipitation: {total_rain:.1f}mm. The clouds released their burden over {rainy_days} day(s) of wetness."
-        ]
-        html += f"<br><br>{random.choice(rain)}"
-    elif total_rain > 0:
-        rain = [
-            f"Some rain fell - {total_rain:.1f}mm over {rainy_days} day(s). A minor disturbance in the atmosphere.",
-            f"{rainy_days} day(s) saw precipitation. Total: {total_rain:.1f}mm. Insignificant, yet recorded.",
-            f"Light rain appeared on {rainy_days} day(s). {total_rain:.1f}mm total. The clouds showed restraint."
-        ]
-        html += f"<br><br>{random.choice(rain)}"
-    else:
-        dry = [
-            "Not a single drop of rain fell. The skies remained obedient to the Empire's will.",
-            "Zero precipitation. The atmosphere knew its place. Dry and compliant.",
-            "The clouds held their water. Complete atmospheric discipline throughout this period."
-        ]
-        html += f"<br><br>{random.choice(dry)}"
-    
-    return html
+    """Format historical weather using Claude API"""
+    return generate_vader_response_with_claude(history, 'history', location_name, days)
 
 # ============= API ENDPOINT =============
 
@@ -580,4 +390,5 @@ def health():
     return jsonify({'status': 'The Empire is operational'}), 200
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+    port = int(os.environ.get('PORT', 5001))
+    app.run(host='0.0.0.0', port=port)

@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Imperial Weather Command</title>
+    <title>Death Star Command - Weather Operations</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&display=swap');
         
         * {
             margin: 0;
@@ -14,48 +14,29 @@
         }
         
         body {
-            font-family: 'Rajdhani', sans-serif;
+            font-family: 'Share Tech Mono', monospace;
             background: #000;
-            color: #fff;
+            color: #0f0;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
             overflow-x: hidden;
+            position: relative;
         }
         
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(ellipse at top, #0a0a2e 0%, #000000 100%);
-            z-index: -2;
-        }
-        
+        /* Starfield background */
         #stars {
             position: fixed;
             width: 100%;
             height: 100%;
             background-image: 
-                radial-gradient(2px 2px at 20% 30%, white, transparent),
-                radial-gradient(2px 2px at 60% 70%, white, transparent),
+                radial-gradient(1px 1px at 20% 30%, white, transparent),
+                radial-gradient(1px 1px at 60% 70%, white, transparent),
                 radial-gradient(1px 1px at 50% 50%, white, transparent),
                 radial-gradient(1px 1px at 80% 10%, white, transparent),
-                radial-gradient(2px 2px at 90% 60%, white, transparent),
-                radial-gradient(1px 1px at 33% 75%, white, transparent),
-                radial-gradient(1px 1px at 66% 40%, white, transparent);
+                radial-gradient(1px 1px at 90% 60%, white, transparent);
             background-size: 200% 200%;
-            animation: twinkle 12s ease-in-out infinite, drift 40s linear infinite;
+            animation: drift 80s linear infinite;
             z-index: -1;
-        }
-        
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
+            opacity: 0.3;
         }
         
         @keyframes drift {
@@ -63,338 +44,688 @@
             to { background-position: 100% 100%; }
         }
         
-        #nebula {
+        /* Grid overlay */
+        .grid-overlay {
             position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            background: 
-                radial-gradient(ellipse at 20% 80%, rgba(139, 0, 0, 0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 20%, rgba(75, 0, 130, 0.1) 0%, transparent 50%);
+            background-image: 
+                linear-gradient(rgba(255, 0, 0, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
             z-index: -1;
-            opacity: 0.6;
+            pointer-events: none;
         }
         
-        .container {
-            max-width: 900px;
-            width: 90%;
-            padding: 50px;
-            background: rgba(10, 10, 10, 0.9);
-            border: 1px solid #ff0000;
-            border-radius: 4px;
-            box-shadow: 0 0 60px rgba(255, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
+        /* Main container */
+        .command-center {
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
         }
         
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 30px;
-        }
-        
-        h1 {
-            font-size: 3em;
-            font-weight: 700;
-            letter-spacing: 10px;
-            color: #ff0000;
-            text-transform: uppercase;
-            margin-bottom: 15px;
-            text-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
-        }
-        
-        .subtitle {
-            font-size: 1em;
-            color: #888;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-        }
-        
-        .location-display {
-            text-align: center;
-            font-size: 1.3em;
-            color: #ff0000;
-            margin-bottom: 35px;
-            padding: 15px;
-            background: rgba(139, 0, 0, 0.1);
-            border: 1px solid #333;
+        /* Header - Command Bar */
+        .command-header {
+            background: linear-gradient(180deg, rgba(20, 0, 0, 0.9) 0%, rgba(10, 0, 0, 0.95) 100%);
+            border: 2px solid #ff0000;
             border-radius: 3px;
+            padding: 25px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .command-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #ff0000, transparent);
+            animation: scanline 3s linear infinite;
+        }
+        
+        @keyframes scanline {
+            to { left: 100%; }
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .station-id {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2em;
+            font-weight: 900;
+            color: #ff0000;
+            letter-spacing: 8px;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+        }
+        
+        .system-status {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85em;
+            color: #0f0;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            background: #0f0;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+            box-shadow: 0 0 10px #0f0;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        /* Main Grid Layout */
+        .control-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        /* Panel styling */
+        .panel {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #ff0000;
+            border-radius: 3px;
+            padding: 20px;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(255, 0, 0, 0.1);
+        }
+        
+        .panel-header {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85em;
+            color: #ff0000;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 0, 0, 0.3);
             letter-spacing: 2px;
-            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
-        .location-display span {
-            color: #fff;
-            font-weight: 600;
+        .panel-id {
+            font-size: 0.7em;
+            color: #666;
+            font-family: 'Share Tech Mono', monospace;
         }
         
-        .input-section {
-            margin-bottom: 35px;
+        /* Target Location Panel */
+        .location-panel {
+            grid-column: 1 / -1;
+            text-align: center;
         }
         
-        label {
-            display: block;
+        .location-readout {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5em;
+            color: #0f0;
+            text-shadow: 0 0 20px #0f0;
+            letter-spacing: 4px;
+            padding: 20px;
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 3px;
+            margin-top: 10px;
+        }
+        
+        /* Radar Display */
+        .radar-panel {
+            grid-row: span 2;
+        }
+        
+        .radar-display {
+            width: 100%;
+            aspect-ratio: 1;
+            background: radial-gradient(circle, rgba(0, 255, 0, 0.1) 0%, transparent 70%);
+            border: 2px solid #0f0;
+            border-radius: 50%;
+            position: relative;
+            margin-top: 15px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+        }
+        
+        .radar-line {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, #0f0, transparent);
+            transform-origin: 0% 50%;
+            animation: radarSweep 4s linear infinite;
+        }
+        
+        @keyframes radarSweep {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .radar-grid {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            height: 90%;
+        }
+        
+        .radar-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid rgba(0, 255, 0, 0.2);
+            border-radius: 50%;
+        }
+        
+        .radar-circle:nth-child(1) { width: 33%; height: 33%; }
+        .radar-circle:nth-child(2) { width: 66%; height: 66%; }
+        .radar-circle:nth-child(3) { width: 100%; height: 100%; }
+        
+        .radar-crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 1px;
+            background: rgba(0, 255, 0, 0.2);
+            transform: translate(-50%, -50%);
+        }
+        
+        .radar-crosshair:nth-child(5) {
+            transform: translate(-50%, -50%) rotate(90deg);
+        }
+        
+        /* Command Input Panel */
+        .input-panel {
+            grid-column: 2;
+        }
+        
+        .input-label {
             color: #ff0000;
             font-size: 0.9em;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-            font-weight: 600;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
         }
         
-        input[type="text"] {
+        .command-input {
             width: 100%;
-            padding: 18px;
-            background: rgba(10, 10, 10, 0.8);
-            border: 1px solid #333;
-            color: #fff;
-            font-family: 'Rajdhani', sans-serif;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #0f0;
+            color: #0f0;
+            font-family: 'Share Tech Mono', monospace;
             font-size: 1.1em;
             border-radius: 3px;
-            transition: all 0.3s;
-            letter-spacing: 0.5px;
+            box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.1);
         }
         
-        input[type="text"]:focus {
+        .command-input:focus {
             outline: none;
-            border-color: #ff0000;
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
-            background: rgba(13, 13, 13, 0.9);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
         }
         
-        input[type="text"]::placeholder {
-            color: #555;
-        }
-        
-        button {
+        .execute-btn {
             width: 100%;
-            padding: 18px;
-            background: #ff0000;
-            border: none;
+            padding: 15px;
+            margin-top: 15px;
+            background: linear-gradient(180deg, #ff0000 0%, #cc0000 100%);
+            border: 2px solid #ff0000;
             color: #000;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1.2em;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1em;
             font-weight: 700;
             letter-spacing: 4px;
-            text-transform: uppercase;
             cursor: pointer;
             border-radius: 3px;
             transition: all 0.3s;
-            margin-top: 20px;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
         }
         
-        button:hover {
-            background: #cc0000;
-            box-shadow: 0 0 25px rgba(255, 0, 0, 0.6);
+        .execute-btn:hover {
+            background: linear-gradient(180deg, #ff3333 0%, #ff0000 100%);
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.6);
             transform: translateY(-2px);
         }
         
-        button:active {
-            transform: translateY(0);
-        }
-        
-        button:disabled {
+        .execute-btn:disabled {
             background: #333;
+            border-color: #333;
             color: #666;
             cursor: not-allowed;
             box-shadow: none;
         }
         
-        .vader-response {
-            background: rgba(139, 0, 0, 0.08);
-            border-left: 4px solid #ff0000;
+        /* Systems Panel */
+        .systems-panel {
+            grid-row: span 2;
+        }
+        
+        .system-readout {
+            font-size: 0.85em;
+            line-height: 2;
+            color: #0f0;
+        }
+        
+        .readout-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.1);
+        }
+        
+        .readout-value {
+            color: #ff0000;
+            font-weight: bold;
+        }
+        
+        /* Vader Transmission Panel */
+        .transmission-panel {
+            grid-column: 1 / -1;
+            min-height: 300px;
+        }
+        
+        .transmission-screen {
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #0f0;
             padding: 30px;
-            margin: 35px 0;
-            font-size: 1.05em;
-            line-height: 1.8;
-            color: #ddd;
-            min-height: 120px;
-            display: none;
+            margin-top: 15px;
             border-radius: 3px;
+            min-height: 250px;
+            position: relative;
+            box-shadow: inset 0 0 30px rgba(0, 255, 0, 0.1);
         }
         
-        .vader-response.show {
+        .transmission-header {
+            color: #ff0000;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .transmission-indicator {
+            width: 15px;
+            height: 15px;
+            background: #ff0000;
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+            box-shadow: 0 0 15px #ff0000;
+        }
+        
+        .transmission-text {
+            color: #0f0;
+            font-size: 1.1em;
+            line-height: 2;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+        }
+        
+        .typing-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.2em;
+            background: #0f0;
+            margin-left: 3px;
+            animation: blink 0.7s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+        
+        /* Weather Data Panel */
+        .data-display {
+            grid-column: 1 / -1;
+            display: none;
+        }
+        
+        .data-display.show {
             display: block;
-            animation: fadeIn 0.6s ease-in;
+            animation: slideIn 0.6s ease-out;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .vader-label {
-            color: #ff0000;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-        
-        .weather-data {
+        .data-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 18px;
-            margin-top: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
         }
         
-        .data-item {
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid #333;
+        .data-module {
+            background: rgba(0, 255, 0, 0.05);
+            border: 2px solid #0f0;
             padding: 20px;
             text-align: center;
             border-radius: 3px;
             transition: all 0.3s;
         }
         
-        .data-item:hover {
-            border-color: #ff0000;
-            background: rgba(139, 0, 0, 0.1);
+        .data-module:hover {
+            background: rgba(0, 255, 0, 0.1);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            transform: scale(1.05);
         }
         
-        .data-value {
-            font-size: 2.2em;
+        .data-value-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5em;
             color: #ff0000;
-            font-weight: 700;
-            margin-bottom: 8px;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+            font-weight: 900;
+            margin: 10px 0;
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
         }
         
-        .data-label {
+        .data-label-display {
             font-size: 0.85em;
-            color: #888;
+            color: #0f0;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
+        }
+        
+        /* Quick Commands Panel */
+        .quick-commands {
+            grid-column: 1 / -1;
+        }
+        
+        .command-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .quick-cmd-btn {
+            padding: 12px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #0f0;
+            color: #0f0;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9em;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+        
+        .quick-cmd-btn:hover {
+            background: rgba(0, 255, 0, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            border-color: #0f0;
         }
         
         .loading {
             text-align: center;
             color: #ff0000;
             font-size: 1.1em;
-            letter-spacing: 3px;
+            animation: loadPulse 1.5s ease-in-out infinite;
         }
         
-        .loading::after {
-            content: '...';
-            animation: dots 1.5s steps(4, end) infinite;
+        @keyframes loadPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
         
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60%, 100% { content: '...'; }
-        }
-        
-        .examples {
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid #222;
-            border-radius: 3px;
-        }
-        
-        .examples-title {
-            color: #ff0000;
-            font-size: 0.9em;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-        
-        .examples ul {
-            list-style: none;
-            color: #888;
-            font-size: 0.95em;
-            line-height: 2;
-        }
-        
-        .examples li::before {
-            content: "▸ ";
-            color: #ff0000;
-            font-weight: bold;
-            margin-right: 8px;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 25px;
-            border-top: 1px solid #222;
-            color: #555;
-            font-size: 0.85em;
-            letter-spacing: 2px;
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .radar-panel,
+            .systems-panel {
+                grid-row: span 1;
+            }
         }
     </style>
 </head>
 <body>
     <div id="stars"></div>
-    <div id="nebula"></div>
+    <div class="grid-overlay"></div>
     
-    <div class="container">
-        <header>
-            <h1>IMPERIAL COMMAND</h1>
-            <p class="subtitle">Atmospheric Intelligence System</p>
-        </header>
-        
-        <div class="location-display" id="locationDisplay">
-            Location: <span id="currentLocation">I Find Your Silence... Disturbing</span>
+    <div class="command-center">
+        <!-- Header -->
+        <div class="command-header">
+            <div class="header-content">
+                <div class="station-id">DEATH STAR WEATHER OPS</div>
+                <div class="system-status">
+                    <div class="status-item">
+                        <div class="status-indicator"></div>
+                        <span>SYSTEMS ONLINE</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-indicator"></div>
+                        <span>VADER LINK ACTIVE</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-indicator"></div>
+                        <span>SATELLITES READY</span>
+                    </div>
+                </div>
+            </div>
         </div>
         
-        <div class="input-section">
-            <label for="queryInput">⚫ State Your Location. The Empire's Satellites Stand Ready</label>
-            <input 
-                type="text" 
-                id="queryInput" 
-                placeholder="Tokyo weather now | London next 5 days | Paris yesterday"
-                autocomplete="off"
-            >
-            <button id="submitBtn" onclick="processQuery()">Submit To The Empire</button>
+        <!-- Main Control Grid -->
+        <div class="control-grid">
+            <!-- Target Location -->
+            <div class="panel location-panel">
+                <div class="panel-header">
+                    TARGET LOCATION
+                    <span class="panel-id">SECTOR-001</span>
+                </div>
+                <div class="location-readout" id="locationDisplay">AWAITING COORDINATES</div>
+            </div>
+            
+            <!-- Radar Display -->
+            <div class="panel radar-panel">
+                <div class="panel-header">
+                    ATMOSPHERIC SCANNER
+                    <span class="panel-id">RAD-7721</span>
+                </div>
+                <div class="radar-display">
+                    <div class="radar-grid">
+                        <div class="radar-circle"></div>
+                        <div class="radar-circle"></div>
+                        <div class="radar-circle"></div>
+                        <div class="radar-crosshair"></div>
+                        <div class="radar-crosshair"></div>
+                    </div>
+                    <div class="radar-line"></div>
+                </div>
+            </div>
+            
+            <!-- Command Input -->
+            <div class="panel input-panel">
+                <div class="panel-header">
+                    COMMAND INPUT
+                    <span class="panel-id">CMD-9940</span>
+                </div>
+                <div class="input-label">▸ ENTER PLANETARY COORDINATES</div>
+                <input 
+                    type="text" 
+                    id="queryInput" 
+                    class="command-input"
+                    placeholder="Tokyo weather now"
+                    autocomplete="off"
+                >
+                <button id="submitBtn" class="execute-btn" onclick="executeCommand()">
+                    EXECUTE COMMAND
+                </button>
+            </div>
+            
+            <!-- Systems Readout -->
+            <div class="panel systems-panel">
+                <div class="panel-header">
+                    SYSTEM DIAGNOSTICS
+                    <span class="panel-id">SYS-3827</span>
+                </div>
+                <div class="system-readout">
+                    <div class="readout-line">
+                        <span>POWER LEVEL:</span>
+                        <span class="readout-value">100%</span>
+                    </div>
+                    <div class="readout-line">
+                        <span>SHIELD STATUS:</span>
+                        <span class="readout-value">OPERATIONAL</span>
+                    </div>
+                    <div class="readout-line">
+                        <span>WEAPON SYSTEMS:</span>
+                        <span class="readout-value">ARMED</span>
+                    </div>
+                    <div class="readout-line">
+                        <span>HYPERDRIVE:</span>
+                        <span class="readout-value">STANDBY</span>
+                    </div>
+                    <div class="readout-line">
+                        <span>LIFE SUPPORT:</span>
+                        <span class="readout-value">NOMINAL</span>
+                    </div>
+                    <div class="readout-line">
+                        <span>COMMS ARRAY:</span>
+                        <span class="readout-value">ACTIVE</span>
+                    </div>
+                    <div class="readout-line">
+                        <span>TARGETING COMP:</span>
+                        <span class="readout-value">LOCKED</span>
+                    </div>
+                    <div class="readout-line">
+                        <span>VADER STATUS:</span>
+                        <span class="readout-value">CONNECTED</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Vader Transmission -->
+            <div class="panel transmission-panel">
+                <div class="panel-header">
+                    TRANSMISSION FROM LORD VADER
+                    <span class="panel-id">COMM-1977</span>
+                </div>
+                <div class="transmission-screen">
+                    <div class="transmission-header">
+                        <div class="transmission-indicator"></div>
+                        <span>SECURE CHANNEL ACTIVE</span>
+                    </div>
+                    <div class="transmission-text" id="transmissionText">
+                        Awaiting command execution...
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Weather Data Display -->
+            <div class="panel data-display" id="dataDisplay">
+                <div class="panel-header">
+                    ATMOSPHERIC DATA READOUT
+                    <span class="panel-id">DATA-5500</span>
+                </div>
+                <div class="data-grid" id="dataGrid"></div>
+            </div>
+            
+            <!-- Quick Commands -->
+            <div class="panel quick-commands">
+                <div class="panel-header">
+                    QUICK OPERATION COMMANDS
+                    <span class="panel-id">QCK-7788</span>
+                </div>
+                <div class="command-buttons">
+                    <button class="quick-cmd-btn" onclick="setCommand('San Diego weather now')">
+                        ▸ SAN DIEGO - CURRENT
+                    </button>
+                    <button class="quick-cmd-btn" onclick="setCommand('Barcelona forecast for next 5 days')">
+                        ▸ BARCELONA - 5 DAY FORECAST
+                    </button>
+                    <button class="quick-cmd-btn" onclick="setCommand('Tokyo weather in 3 days')">
+                        ▸ TOKYO - 3 DAY PROJECTION
+                    </button>
+                    <button class="quick-cmd-btn" onclick="setCommand('London weather yesterday')">
+                        ▸ LONDON - HISTORICAL DATA
+                    </button>
+                    <button class="quick-cmd-btn" onclick="setCommand('New York next week')">
+                        ▸ NEW YORK - WEEK FORECAST
+                    </button>
+                </div>
+            </div>
         </div>
-        
-        <div class="vader-response" id="response">
-            <div class="vader-label">⚫ DARTH VADER:</div>
-            <div id="responseText"></div>
-        </div>
-        
-        <div class="examples">
-            <div class="examples-title">Learn From These, Young Apprentice</div>
-            <ul>
-                <li>"San Diego weather now"</li>
-                <li>"Barcelona forecast for next 5 days"</li>
-                <li>"Tokyo weather in 3 days"</li>
-                <li>"What was London weather yesterday?"</li>
-                <li>"New York next week"</li>
-            </ul>
-        </div>
-        
-        <footer>
-            ⚫ THE EMPIRE'S WEATHER DOMINION IS ABSOLUTE ⚫
-        </footer>
     </div>
     
     <script>
-        // Backend API URL - ALL logic comes from Python now!
+        // Backend API URL - Change to your Render URL when deploying
         const API_URL = 'https://darth-vader-weather-bot.onrender.com/api/weather';
         
-        async function processQuery() {
+        // Typing animation
+        function typeWriter(element, text, speed = 20) {
+            return new Promise((resolve) => {
+                let i = 0;
+                element.innerHTML = '';
+                
+                const cursor = document.createElement('span');
+                cursor.className = 'typing-cursor';
+                element.appendChild(cursor);
+                
+                function type() {
+                    if (i < text.length) {
+                        const textNode = document.createTextNode(text.charAt(i));
+                        element.insertBefore(textNode, cursor);
+                        i++;
+                        setTimeout(type, speed);
+                    } else {
+                        cursor.remove();
+                        element.innerHTML = text;
+                        resolve();
+                    }
+                }
+                
+                type();
+            });
+        }
+        
+        async function executeCommand() {
             const queryInput = document.getElementById('queryInput').value.trim();
-            const responseDiv = document.getElementById('response');
-            const responseText = document.getElementById('responseText');
+            const transmissionText = document.getElementById('transmissionText');
+            const dataDisplay = document.getElementById('dataDisplay');
+            const dataGrid = document.getElementById('dataGrid');
             const submitBtn = document.getElementById('submitBtn');
-            const locationDisplay = document.getElementById('currentLocation');
+            const locationDisplay = document.getElementById('locationDisplay');
             
             if (!queryInput) {
-                alert('You must specify a command. The Empire demands it.');
+                alert('COMMAND REQUIRED. SPECIFY TARGET COORDINATES.');
                 return;
             }
             
             submitBtn.disabled = true;
-            responseDiv.classList.remove('show');
-            responseText.innerHTML = '<div class="loading">ACCESSING IMPERIAL SATELLITES</div>';
-            responseDiv.classList.add('show');
+            dataDisplay.classList.remove('show');
+            transmissionText.innerHTML = '<div class="loading">ACCESSING IMPERIAL SATELLITE NETWORK...</div>';
             
             try {
-                // Call Python backend - ALL Vader logic is there!
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
@@ -406,23 +737,38 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    // Success - display location and response from Python
-                    locationDisplay.textContent = data.location;
-                    responseText.innerHTML = data.response;
+                    // Update location
+                    locationDisplay.textContent = data.location.toUpperCase();
+                    
+                    // Remove HTML and prepare text
+                    const plainText = data.response
+                        .replace(/<br\s*\/?>/gi, '\n\n')
+                        .replace(/<[^>]+>/g, '');
+                    
+                    // Type out response
+                    await typeWriter(transmissionText, plainText, 20);
+                    
+                    // Show data display if available
+                    // Note: Current backend doesn't separate weather cards, but structure is ready
+                    dataDisplay.classList.add('show');
                 } else {
-                    // Error from Python backend
-                    responseText.innerHTML = data.error || 'The Empire\'s systems have experienced a disturbance.';
+                    transmissionText.innerHTML = data.error || 'SYSTEM ERROR. TRANSMISSION FAILED.';
                 }
             } catch (error) {
-                responseText.innerHTML = `A disturbance in the Force has occurred. The connection to the Imperial network has failed.<br><br>Error: ${error.message}`;
+                transmissionText.innerHTML = `CRITICAL FAILURE. CONNECTION TO IMPERIAL NETWORK LOST.<br><br>ERROR CODE: ${error.message}`;
             }
             
             submitBtn.disabled = false;
         }
         
-        // Allow Enter key to submit
+        function setCommand(command) {
+            document.getElementById('queryInput').value = command;
+            executeCommand();
+        }
+        
+        // Enter key
         document.getElementById('queryInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') processQuery();
+            if (e.key === 'Enter') executeCommand();
         });
     </script>
 </body>
