@@ -62,7 +62,7 @@
         /* Main container */
         .command-center {
             padding: 20px;
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
         }
         
@@ -71,7 +71,7 @@
             background: linear-gradient(180deg, rgba(20, 0, 0, 0.9) 0%, rgba(10, 0, 0, 0.95) 100%);
             border: 2px solid #ff0000;
             border-radius: 3px;
-            padding: 20px;
+            padding: 25px;
             margin-bottom: 20px;
             position: relative;
             overflow: hidden;
@@ -96,25 +96,22 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
         }
         
         .station-id {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.8em;
+            font-size: 2em;
             font-weight: 900;
             color: #ff0000;
-            letter-spacing: 6px;
+            letter-spacing: 8px;
             text-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
         }
         
         .system-status {
             display: flex;
-            gap: 15px;
-            font-size: 0.8em;
+            gap: 20px;
+            font-size: 0.85em;
             color: #0f0;
-            flex-wrap: wrap;
         }
         
         .status-item {
@@ -124,8 +121,8 @@
         }
         
         .status-indicator {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             background: #0f0;
             border-radius: 50%;
             animation: pulse 2s ease-in-out infinite;
@@ -137,161 +134,77 @@
             50% { opacity: 0.3; }
         }
         
-        /* Location Display */
-        .location-panel {
+        /* Main Grid Layout */
+        .control-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        /* Panel styling */
+        .panel {
             background: rgba(0, 0, 0, 0.9);
             border: 2px solid #ff0000;
             border-radius: 3px;
             padding: 20px;
-            margin-bottom: 20px;
-            text-align: center;
+            position: relative;
             box-shadow: inset 0 0 20px rgba(255, 0, 0, 0.1);
         }
         
         .panel-header {
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.9em;
+            font-size: 0.85em;
             color: #ff0000;
             margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 0, 0, 0.3);
             letter-spacing: 2px;
-            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .panel-id {
+            font-size: 0.7em;
+            color: #666;
+            font-family: 'Share Tech Mono', monospace;
+        }
+        
+        /* Target Location Panel */
+        .location-panel {
+            grid-column: 1 / -1;
+            text-align: center;
         }
         
         .location-readout {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2em;
+            font-size: 2.5em;
             color: #0f0;
             text-shadow: 0 0 20px #0f0;
-            letter-spacing: 3px;
-            padding: 15px;
+            letter-spacing: 4px;
+            padding: 20px;
             background: rgba(0, 255, 0, 0.05);
             border: 1px solid rgba(0, 255, 0, 0.3);
             border-radius: 3px;
-        }
-        
-        /* Command Input Section - BIGGER & MORE PROMINENT */
-        .input-section {
-            background: rgba(0, 0, 0, 0.9);
-            border: 3px solid #ff0000;
-            border-radius: 5px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 
-                0 0 30px rgba(255, 0, 0, 0.3),
-                inset 0 0 20px rgba(255, 0, 0, 0.1);
-        }
-        
-        .input-header {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2em;
-            color: #ff0000;
-            margin-bottom: 20px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            text-align: center;
-        }
-        
-        .command-input {
-            width: 100%;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.9);
-            border: 3px solid #0f0;
-            color: #0f0;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 1.3em;
-            border-radius: 5px;
-            box-shadow: 
-                inset 0 0 15px rgba(0, 255, 0, 0.2),
-                0 0 20px rgba(0, 255, 0, 0.3);
-            transition: all 0.3s;
-        }
-        
-        .command-input:focus {
-            outline: none;
-            box-shadow: 
-                inset 0 0 20px rgba(0, 255, 0, 0.3),
-                0 0 30px rgba(0, 255, 0, 0.5);
-            border-color: #0f0;
-        }
-        
-        .command-input::placeholder {
-            color: rgba(0, 255, 0, 0.4);
-            font-style: italic;
-        }
-        
-        .execute-btn {
-            width: 100%;
-            padding: 20px;
-            margin-top: 20px;
-            background: linear-gradient(180deg, #ff0000 0%, #cc0000 100%);
-            border: 3px solid #ff0000;
-            color: #000;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.4em;
-            font-weight: 700;
-            letter-spacing: 5px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: all 0.3s;
-            box-shadow: 0 0 25px rgba(255, 0, 0, 0.4);
-            text-transform: uppercase;
-        }
-        
-        .execute-btn:hover {
-            background: linear-gradient(180deg, #ff3333 0%, #ff0000 100%);
-            box-shadow: 0 0 40px rgba(255, 0, 0, 0.7);
-            transform: translateY(-2px);
-        }
-        
-        .execute-btn:active {
-            transform: translateY(0);
-        }
-        
-        .execute-btn:disabled {
-            background: #333;
-            border-color: #333;
-            color: #666;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-        
-        /* Command Center Panels */
-        .command-panels {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .panel {
-            background: rgba(0, 0, 0, 0.9);
-            border: 2px solid rgba(255, 0, 0, 0.5);
-            border-radius: 3px;
-            padding: 20px;
-            box-shadow: inset 0 0 20px rgba(255, 0, 0, 0.05);
-        }
-        
-        .panel-header-small {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.85em;
-            color: #ff0000;
-            margin-bottom: 15px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-align: center;
+            margin-top: 10px;
         }
         
         /* Radar Display */
+        .radar-panel {
+            grid-row: span 2;
+        }
+        
         .radar-display {
             width: 100%;
-            max-width: 200px;
             aspect-ratio: 1;
             background: radial-gradient(circle, rgba(0, 255, 0, 0.1) 0%, transparent 70%);
             border: 2px solid #0f0;
             border-radius: 50%;
             position: relative;
-            margin: 0 auto;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            margin-top: 15px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
         }
         
         .radar-line {
@@ -342,11 +255,75 @@
             transform: translate(-50%, -50%);
         }
         
-        .radar-crosshair.radar-vertical {
+        .radar-crosshair:nth-child(5) {
             transform: translate(-50%, -50%) rotate(90deg);
         }
         
-        /* System Diagnostics */
+        /* Command Input Panel */
+        .input-panel {
+            grid-column: 2;
+        }
+        
+        .input-label {
+            color: #ff0000;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .command-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #0f0;
+            color: #0f0;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.1em;
+            border-radius: 3px;
+            box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.1);
+        }
+        
+        .command-input:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+        
+        .execute-btn {
+            width: 100%;
+            padding: 15px;
+            margin-top: 15px;
+            background: linear-gradient(180deg, #ff0000 0%, #cc0000 100%);
+            border: 2px solid #ff0000;
+            color: #000;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1em;
+            font-weight: 700;
+            letter-spacing: 4px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+        
+        .execute-btn:hover {
+            background: linear-gradient(180deg, #ff3333 0%, #ff0000 100%);
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.6);
+            transform: translateY(-2px);
+        }
+        
+        .execute-btn:disabled {
+            background: #333;
+            border-color: #333;
+            color: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        /* Systems Panel */
+        .systems-panel {
+            grid-row: span 2;
+        }
+        
         .system-readout {
             font-size: 0.85em;
             line-height: 2;
@@ -365,42 +342,36 @@
             font-weight: bold;
         }
         
-        /* Transmission Panel */
+        /* Vader Transmission Panel */
         .transmission-panel {
-            background: rgba(0, 0, 0, 0.9);
-            border: 2px solid #ff0000;
+            grid-column: 1 / -1;
+            min-height: 300px;
+        }
+        
+        .transmission-screen {
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #0f0;
+            padding: 30px;
+            margin-top: 15px;
             border-radius: 3px;
-            padding: 20px;
-            margin-bottom: 20px;
-            min-height: 200px;
-            box-shadow: inset 0 0 20px rgba(255, 0, 0, 0.1);
-            display: none;
-        }
-        
-        .transmission-panel.show {
-            display: block;
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            min-height: 250px;
+            position: relative;
+            box-shadow: inset 0 0 30px rgba(0, 255, 0, 0.1);
         }
         
         .transmission-header {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1em;
             color: #ff0000;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2em;
             margin-bottom: 20px;
-            letter-spacing: 2px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
         }
         
         .transmission-indicator {
-            width: 12px;
-            height: 12px;
+            width: 15px;
+            height: 15px;
             background: #ff0000;
             border-radius: 50%;
             animation: pulse 1.5s ease-in-out infinite;
@@ -409,7 +380,7 @@
         
         .transmission-text {
             color: #0f0;
-            font-size: 1.2em;
+            font-size: 1.1em;
             line-height: 2;
             text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
         }
@@ -428,28 +399,70 @@
             50%, 100% { opacity: 0; }
         }
         
-        /* Quick Commands */
-        .quick-commands {
-            background: rgba(0, 0, 0, 0.9);
-            border: 2px solid rgba(255, 0, 0, 0.5);
-            border-radius: 3px;
-            padding: 20px;
-            margin-top: 20px;
+        /* Weather Data Panel */
+        .data-display {
+            grid-column: 1 / -1;
+            display: none;
         }
         
-        .commands-title {
+        .data-display.show {
+            display: block;
+            animation: slideIn 0.6s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .data-module {
+            background: rgba(0, 255, 0, 0.05);
+            border: 2px solid #0f0;
+            padding: 20px;
+            text-align: center;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+        
+        .data-module:hover {
+            background: rgba(0, 255, 0, 0.1);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .data-value-display {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1em;
+            font-size: 2.5em;
             color: #ff0000;
-            margin-bottom: 15px;
-            letter-spacing: 2px;
+            font-weight: 900;
+            margin: 10px 0;
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+        }
+        
+        .data-label-display {
+            font-size: 0.85em;
+            color: #0f0;
             text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        /* Quick Commands Panel */
+        .quick-commands {
+            grid-column: 1 / -1;
         }
         
         .command-buttons {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 10px;
+            margin-top: 15px;
         }
         
         .quick-cmd-btn {
@@ -467,6 +480,7 @@
         .quick-cmd-btn:hover {
             background: rgba(0, 255, 0, 0.2);
             box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            border-color: #0f0;
         }
         
         .loading {
@@ -481,111 +495,15 @@
             50% { opacity: 1; }
         }
         
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .command-center {
-                padding: 10px;
-            }
-            
-            .command-header {
-                padding: 15px;
-            }
-            
-            .header-content {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .station-id {
-                font-size: 1.3em;
-                letter-spacing: 3px;
-            }
-            
-            .system-status {
-                justify-content: center;
-                font-size: 0.7em;
-            }
-            
-            .location-panel {
-                padding: 15px;
-            }
-            
-            .location-readout {
-                font-size: 1.3em;
-                padding: 10px;
-            }
-            
-            .input-section {
-                padding: 20px 15px;
-            }
-            
-            .input-header {
-                font-size: 1em;
-            }
-            
-            .command-input {
-                font-size: 1.1em;
-                padding: 15px;
-            }
-            
-            .execute-btn {
-                font-size: 1.1em;
-                padding: 15px;
-                letter-spacing: 3px;
-            }
-            
-            .command-panels {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            .panel {
-                padding: 15px;
-            }
-            
-            .radar-display {
-                max-width: 180px;
-            }
-            
-            .transmission-panel {
-                padding: 15px;
-            }
-            
-            .transmission-text {
-                font-size: 1em;
-            }
-            
-            .command-buttons {
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .control-grid {
                 grid-template-columns: 1fr;
             }
-        }
-        
-        @media (max-width: 480px) {
-            .station-id {
-                font-size: 1em;
-                letter-spacing: 2px;
-            }
             
-            .location-readout {
-                font-size: 1.1em;
-            }
-            
-            .command-input {
-                font-size: 1em;
-                padding: 12px;
-            }
-            
-            .execute-btn {
-                font-size: 1em;
-                padding: 12px;
-            }
-            
-            .radar-display {
-                max-width: 150px;
-            }
-            
-            .system-readout {
-                font-size: 0.75em;
+            .radar-panel,
+            .systems-panel {
+                grid-row: span 1;
             }
         }
     </style>
@@ -616,101 +534,151 @@
             </div>
         </div>
         
-        <!-- Target Location -->
-        <div class="location-panel">
-            <div class="panel-header">TARGET LOCATION</div>
-            <div class="location-readout" id="locationDisplay">AWAITING COORDINATES</div>
-        </div>
-        
-        <!-- Command Input Section -->
-        <div class="input-section">
-            <div class="input-header">⬢ ENTER PLANETARY COORDINATES ⬢</div>
-            <input 
-                type="text" 
-                id="queryInput" 
-                class="command-input"
-                placeholder="Tokyo weather now | San Diego next 5 days"
-                autocomplete="off"
-            >
-            <button id="submitBtn" class="execute-btn" onclick="executeCommand()">
-                Execute Command
-            </button>
-        </div>
-        
-        <!-- Command Center Panels -->
-        <div class="command-panels">
-            <!-- Radar Scanner -->
+        <!-- Main Control Grid -->
+        <div class="control-grid">
+            <!-- Target Location -->
+            <div class="panel location-panel">
+                <div class="panel-header">
+                    TARGET LOCATION
+                    <span class="panel-id">SECTOR-001</span>
+                </div>
+                <div class="location-readout" id="locationDisplay">AWAITING COORDINATES</div>
+            </div>
+            
+            <!-- Radar Display -->
             <div class="panel radar-panel">
-                <div class="panel-header-small">ATMOSPHERIC SCANNER</div>
+                <div class="panel-header">
+                    ATMOSPHERIC SCANNER
+                    <span class="panel-id">RAD-7721</span>
+                </div>
                 <div class="radar-display">
                     <div class="radar-grid">
                         <div class="radar-circle"></div>
                         <div class="radar-circle"></div>
                         <div class="radar-circle"></div>
                         <div class="radar-crosshair"></div>
-                        <div class="radar-crosshair radar-vertical"></div>
+                        <div class="radar-crosshair"></div>
                     </div>
                     <div class="radar-line"></div>
                 </div>
             </div>
             
-            <!-- System Diagnostics -->
-            <div class="panel diagnostics-panel">
-                <div class="panel-header-small">SYSTEM DIAGNOSTICS</div>
+            <!-- Command Input -->
+            <div class="panel input-panel">
+                <div class="panel-header">
+                    COMMAND INPUT
+                    <span class="panel-id">CMD-9940</span>
+                </div>
+                <div class="input-label">▸ ENTER PLANETARY COORDINATES</div>
+                <input 
+                    type="text" 
+                    id="queryInput" 
+                    class="command-input"
+                    placeholder="Tokyo weather now"
+                    autocomplete="off"
+                >
+                <button id="submitBtn" class="execute-btn" onclick="executeCommand()">
+                    EXECUTE COMMAND
+                </button>
+            </div>
+            
+            <!-- Systems Readout -->
+            <div class="panel systems-panel">
+                <div class="panel-header">
+                    SYSTEM DIAGNOSTICS
+                    <span class="panel-id">SYS-3827</span>
+                </div>
                 <div class="system-readout">
                     <div class="readout-line">
                         <span>POWER LEVEL:</span>
                         <span class="readout-value">100%</span>
                     </div>
                     <div class="readout-line">
-                        <span>VADER STATUS:</span>
-                        <span class="readout-value">CONNECTED</span>
+                        <span>SHIELD STATUS:</span>
+                        <span class="readout-value">OPERATIONAL</span>
                     </div>
                     <div class="readout-line">
                         <span>WEAPON SYSTEMS:</span>
                         <span class="readout-value">ARMED</span>
                     </div>
                     <div class="readout-line">
+                        <span>HYPERDRIVE:</span>
+                        <span class="readout-value">STANDBY</span>
+                    </div>
+                    <div class="readout-line">
+                        <span>LIFE SUPPORT:</span>
+                        <span class="readout-value">NOMINAL</span>
+                    </div>
+                    <div class="readout-line">
+                        <span>COMMS ARRAY:</span>
+                        <span class="readout-value">ACTIVE</span>
+                    </div>
+                    <div class="readout-line">
                         <span>TARGETING COMP:</span>
                         <span class="readout-value">LOCKED</span>
                     </div>
+                    <div class="readout-line">
+                        <span>VADER STATUS:</span>
+                        <span class="readout-value">CONNECTED</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Vader Transmission -->
-        <div class="transmission-panel" id="transmissionPanel">
-            <div class="transmission-header">
-                <div class="transmission-indicator"></div>
-                <span>TRANSMISSION FROM LORD VADER</span>
+            
+            <!-- Vader Transmission -->
+            <div class="panel transmission-panel">
+                <div class="panel-header">
+                    TRANSMISSION FROM LORD VADER
+                    <span class="panel-id">COMM-1977</span>
+                </div>
+                <div class="transmission-screen">
+                    <div class="transmission-header">
+                        <div class="transmission-indicator"></div>
+                        <span>SECURE CHANNEL ACTIVE</span>
+                    </div>
+                    <div class="transmission-text" id="transmissionText">
+                        Awaiting command execution...
+                    </div>
+                </div>
             </div>
-            <div class="transmission-text" id="transmissionText">
-                Awaiting command execution...
+            
+            <!-- Weather Data Display -->
+            <div class="panel data-display" id="dataDisplay">
+                <div class="panel-header">
+                    ATMOSPHERIC DATA READOUT
+                    <span class="panel-id">DATA-5500</span>
+                </div>
+                <div class="data-grid" id="dataGrid"></div>
             </div>
-        </div>
-        
-        <!-- Quick Commands -->
-        <div class="quick-commands">
-            <div class="commands-title">Quick Operation Commands</div>
-            <div class="command-buttons">
-                <button class="quick-cmd-btn" onclick="setCommand('San Diego weather now')">
-                    ▸ SAN DIEGO - CURRENT
-                </button>
-                <button class="quick-cmd-btn" onclick="setCommand('Barcelona forecast for next 5 days')">
-                    ▸ BARCELONA - 5 DAY FORECAST
-                </button>
-                <button class="quick-cmd-btn" onclick="setCommand('Tokyo weather in 3 days')">
-                    ▸ TOKYO - 3 DAY PROJECTION
-                </button>
-                <button class="quick-cmd-btn" onclick="setCommand('London weather yesterday')">
-                    ▸ LONDON - HISTORICAL DATA
-                </button>
+            
+            <!-- Quick Commands -->
+            <div class="panel quick-commands">
+                <div class="panel-header">
+                    QUICK OPERATION COMMANDS
+                    <span class="panel-id">QCK-7788</span>
+                </div>
+                <div class="command-buttons">
+                    <button class="quick-cmd-btn" onclick="setCommand('San Diego weather now')">
+                        ▸ SAN DIEGO - CURRENT
+                    </button>
+                    <button class="quick-cmd-btn" onclick="setCommand('Barcelona forecast for next 5 days')">
+                        ▸ BARCELONA - 5 DAY FORECAST
+                    </button>
+                    <button class="quick-cmd-btn" onclick="setCommand('Tokyo weather in 3 days')">
+                        ▸ TOKYO - 3 DAY PROJECTION
+                    </button>
+                    <button class="quick-cmd-btn" onclick="setCommand('London weather yesterday')">
+                        ▸ LONDON - HISTORICAL DATA
+                    </button>
+                    <button class="quick-cmd-btn" onclick="setCommand('New York next week')">
+                        ▸ NEW YORK - WEEK FORECAST
+                    </button>
+                </div>
             </div>
         </div>
     </div>
     
     <script>
-        // Backend API URL
+        // Backend API URL - Change to your Render URL when deploying
         const API_URL = 'https://darth-vader-weather-bot.onrender.com/api/weather';
         
         // Typing animation
@@ -742,8 +710,9 @@
         
         async function executeCommand() {
             const queryInput = document.getElementById('queryInput').value.trim();
-            const transmissionPanel = document.getElementById('transmissionPanel');
             const transmissionText = document.getElementById('transmissionText');
+            const dataDisplay = document.getElementById('dataDisplay');
+            const dataGrid = document.getElementById('dataGrid');
             const submitBtn = document.getElementById('submitBtn');
             const locationDisplay = document.getElementById('locationDisplay');
             
@@ -753,7 +722,7 @@
             }
             
             submitBtn.disabled = true;
-            transmissionPanel.classList.add('show');
+            dataDisplay.classList.remove('show');
             transmissionText.innerHTML = '<div class="loading">ACCESSING IMPERIAL SATELLITE NETWORK...</div>';
             
             try {
@@ -778,6 +747,10 @@
                     
                     // Type out response
                     await typeWriter(transmissionText, plainText, 20);
+                    
+                    // Show data display if available
+                    // Note: Current backend doesn't separate weather cards, but structure is ready
+                    dataDisplay.classList.add('show');
                 } else {
                     transmissionText.innerHTML = data.error || 'SYSTEM ERROR. TRANSMISSION FAILED.';
                 }
